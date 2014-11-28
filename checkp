@@ -1,0 +1,9 @@
+#!/usr/sbin/dtrace 
+#Created on 28-Nov-2014
+#This Dtrace script to check the process which called for what program 
+#UAGE : ./checkp
+syscall::read:entry
+/execname != "Terminal"/
+{
+    printf ("%s called read, asking for %d bytes\n", execname, arg2);
+}
