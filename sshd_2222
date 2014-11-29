@@ -1,0 +1,53 @@
+#!/bin/bash
+#
+# sshd		Start up the OpenSSH server daemon on 2222 port 
+#
+# chkconfig: 2345 55 25
+# description:This init startup script start the anather sshd daemon on the port 2222 
+#it uses diffrent configuration file located on /usr/local/etc/ssh/sshd_config if you want change any ssh parameter, please edit here 
+#the normal ssh which is running on port 22 is remain unchanged 
+#  
+#
+# processname: sshd_2222
+CONF=/usr/local/etc/ssh/sshd_config
+PID=/usr/local/etc/sshd.pid
+
+start()
+{
+
+	/usr/sbin/sshd -f $CONF
+
+	}
+
+	stop()
+	{
+
+		test -f "$PID" && kill -9 `cat "$PID"`
+
+		}
+
+		status()
+		{
+
+			test -f "$PID" && echo "Openssh_Daemon running @2222 port........(pid  `cat "$PID"`)"
+			}	
+
+
+			case $1 in
+
+				start)	
+						start
+								;;
+									stop)
+										
+												stop
+														;;
+
+															status)
+
+																	status
+																			;;
+																			           *)
+																								 		echo $"Usage: $0 {start|stop|status}"	
+																										esac
+
