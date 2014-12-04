@@ -1,0 +1,24 @@
+#!/bin/bash
+#DESCRIPTION : a very basic script to sync two directories
+#USAGE : mysync <source DIR> <destination DIR>
+#CREATED ON : 4 - Nov -2014
+SRC="$1"
+DST="$2"
+SC=`ls $1 | wc -l`
+DC=`ls $2 | wc -l`
+if [ $SC -eq $DC ]
+then
+clear
+echo " The Directories are already in sync.....!!"
+elif [ $SC -gt $DC ]
+then
+echo " file copying in progress....."
+sleep 2
+rsync $1/* $2
+echo " The files in $SRC and $DST are in sync now ....!!!"
+else
+echo " file copying in progress....."
+sleep 2
+rsync $2/* $1
+echo " The files in $SRC and $DST are in sync now ....!!!"
+fi
