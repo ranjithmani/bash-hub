@@ -2,6 +2,10 @@
 #DESCRIPTION : a very basic script to sync two directories
 #USAGE : mysync <source DIR> <destination DIR>
 #CREATED ON : 4 - Nov -2014
+if [ ! -d $2 ]
+then
+mkdir $2
+fi
 SRC="$1"
 DST="$2"
 SC=`ls $1 | wc -l`
