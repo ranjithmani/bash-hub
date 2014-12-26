@@ -1,0 +1,19 @@
+#/bin/bash
+# USAGE : To copy 10 files only if there are more than 10 files in the source directory
+#CREATED ON : 26 - Dec - 2014
+DIR=/opt
+ODIR=192.168.0.1:/opt/
+LIST=echo "$(ls -l |wc -l) - 2" |bc
+if [ $LIST < 10 ]
+then 
+echo " The files on $DIR is less than 10......!!!!!! "
+else 
+ls -lrt $DIR >> file.txt
+tail -10 file.txt >> copy.txt
+for i in `cat copy.txt`
+do
+sshpass -p "password" scp -pr $DIR/$i root@$ODIR 
+done
+fi
+>file.txt
+>copy.txt
