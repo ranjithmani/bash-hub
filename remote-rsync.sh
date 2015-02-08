@@ -1,0 +1,13 @@
+#!/bin/bash
+# RSYNC SCRIPT TO SYNC /DMS FILESYSTEM BETWEEN DMSAPP1 and DMSAPP2
+# variables
+SOURCE_PATH='/DMS/'
+SOURCE_SERVER='DMSAPP1'
+DESTINATION_PATH='/DMS/'
+DESTINATION_HOST='DMSAPP2'
+DESTINATION_USER='root'
+LOGFILE='/var/log/DMS_sync_log'
+#copying the files
+echo $'\n\n' >> $LOGFILE
+/usr/bin/rsync -arvA --rsh=ssh $SOURCE_PATH $DESTINATION_USER@$DESTINATION_HOST:$DESTINATION_PATH 2>&1 >> $LOGFILE
+echo "Sync Completed at:`/bin/date`" >> $LOGFILE
