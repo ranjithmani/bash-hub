@@ -1,0 +1,95 @@
+#!/bin/bash
+#created on 26-Nov-2014
+#This script is a collection of dtrace one-liners
+#USAGE : trace <option>
+clear;
+echo "===================================================================================================";
+echo "                     SYSTEM DEBUGGING UTILITY FOR SOLARIS10,BSD,SMARTOS                            ";
+echo "===================================================================================================";
+echo " "
+echo "1)--->New processes with arguments.";
+echo "2)--->Files opened by process.";
+echo "3)--->Syscall count by program.";
+echo "4)--->Syscall count by syscall.";
+echo "5)--->Syscall count by process.";
+echo "6)--->Read bytes by process.";
+echo "7)--->Write bytes by process.";
+echo "8)--->Read size distribution by process.";
+echo "9)--->Write size distribution by process.";
+echo "10)-->Disk size by process.";
+echo "11)-->Pages paged in by process.";
+echo "12)-->Minor faults by process.";
+echo "13)-->Interrupts by CPU.";
+echo " "
+echo "Enter your choice [1 - 13] :";
+read cho
+case $cho in 
+
+1)
+# New processes with arguments,
+/usr/sbin/dtrace -n 'proc:::exec-success { trace(curpsinfo->pr_psargs); }'
+;;
+ 
+2)
+# Files opened by process,
+/usr/sbin/dtrace -n 'syscall::open*:entry { printf("%s %s",execname,copyinstr(arg0)); }'
+;;
+
+3) 
+# Syscall count by program,
+/usr/sbin/dtrace -n 'syscall:::entry { @num[execname] = count(); }'
+;;
+
+4) 
+# Syscall count by syscall,
+/usr/sbin/dtrace -n 'syscall:::entry { @num[probefunc] = count(); }'
+;;
+
+5) 
+# Syscall count by process,
+/usr/sbin/dtrace -n 'syscall:::entry { @num[pid,execname] = count(); }'
+;;
+
+6) 
+# Read bytes by process,
+/usr/sbin/dtrace -n 'sysinfo:::readch { @bytes[execname] = sum(arg0); }'
+;;
+
+7) 
+# Write bytes by process,
+/usr/sbin/dtrace -n 'sysinfo:::writech { @bytes[execname] = sum(arg0); }'
+;;
+
+8) 
+# Read size distribution by process,
+/usr/sbin/dtrace -n 'sysinfo:::readch { @dist[execname] = quantize(arg0); }'
+;;
+
+9) 
+# Write size distribution by process,
+/usr/sbin/dtrace -n 'sysinfo:::writech { @dist[execname] = quantize(arg0); }'
+;;
+
+10) 
+# Disk size by process,
+/usr/sbin/dtrace -n 'io:::start { printf("%d %s %d",pid,execname,args[0]->b_bcount); }'
+;;
+
+11) 
+# Pages paged in by process,
+/usr/sbin/dtrace -n 'vminfo:::pgpgin { @pg[execname] = sum(arg0); }'
+;;
+
+12) 
+# Minor faults by process,
+/usr/sbin/dtrace -n 'vminfo:::as_fault { @mem[execname] = sum(arg0); }'
+;; 
+
+13)
+# Interrupts by CPU,
+/usr/sbin/dtrace -n 'sdt:::interrupt-start { @num[cpu] = count(); }'
+;;
+
+*)
+echo "USAGE : trace <option?>"
+esac 
