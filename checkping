@@ -1,0 +1,25 @@
+#!/bin/bash
+#created by : Ranjith
+#Created on : 14-MAR-2015
+#To monitor the host status on the network
+#USAGE : checkping <log file location> <first server ip/hostname> <second server ip/hostname>
+#feel free to modify this script so it become more usable/efficient 
+LOG=$1/pingout-`date +%d-%m-%y`.txt
+while true
+do
+ping -c 1 $2 &> /dev/null
+if [ $? -eq 0 ]
+then
+echo "$2 server is UP @ `date`" >> $LOG
+else
+echo "$2 server is not REACHABLE @ `date`" >> $LOG
+fi
+ping -c 1 $3 &> /dev/null
+if [ $? -eq 0 ]
+then
+echo "$3 server is UP @ `date`" >> $LOG
+else
+echo "$3 server is not able to contact in gateway @ `date`" >> $LOG
+fi
+sleep 5
+done
