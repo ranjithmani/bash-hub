@@ -17,37 +17,30 @@ start()
 
 	/usr/sbin/sshd -f $CONF
 
-	}
+}
 
-	stop()
-	{
+stop()
+ {
 
-		test -f "$PID" && kill -9 `cat "$PID"`
+ test -f "$PID" && kill -9 `cat "$PID"`
+ 
+  }
+status()
+ {
 
-		}
+  test -f "$PID" && echo "Openssh_Daemon running @2222 port........(pid  `cat "$PID"`)"
+ }	
 
-		status()
-		{
-
-			test -f "$PID" && echo "Openssh_Daemon running @2222 port........(pid  `cat "$PID"`)"
-			}	
-
-
-			case $1 in
-
-				start)	
-						start
-								;;
-									stop)
-										
-												stop
-														;;
-
-															status)
-
-																	status
-																			;;
-																			           *)
-																								 		echo $"Usage: $0 {start|stop|status}"	
-																										esac
-
+  case $1 in
+  start)	
+  start
+  ;;
+  stop)
+  stop
+  ;;
+  status)
+  status
+  ;;
+  *)
+  echo $"Usage: $0 {start|stop|status}"	
+  esac
