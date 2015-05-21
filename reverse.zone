@@ -1,0 +1,18 @@
+$TTL 1D
+@       IN SOA  bind.internal.local. root.internal.local. (
+                                        7       ; serial
+                                        30      ; refresh
+                                        1H      ; retry
+                                        1W      ; expire
+                                        30      ; minimum
+)
+@               IN      NS      bind.internal.local.
+@               IN      NS      slave.internal.local.
+@               IN      PTR     internal.local.
+bind            IN      A       192.168.1.2
+slave           IN      A       192.168.1.3
+node1           IN      A       192.168.1.4
+2               IN      PTR     bind.internal.local.
+3               IN      PTR     slave.internal.local.
+4               IN      PTR     node1.internal.local.
+5               IN      PTR     node2.internal.local.
