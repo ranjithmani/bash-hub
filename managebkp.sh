@@ -1,12 +1,17 @@
 #!/bin/bash
 #
 #script to take backup , rotate and  transfer it.
+#pre-requsites:
+#1 . a user gsmc in the booth servers and passwordless auth enabled
+#2 . utilities like bc, rsync 
 #USAGE: ./managebkp.sh backup , ./managebkp.sh copy , ./managebkp.sh rotate
 #Created By :Ranjith Mani
 #Created Date:6-August-2015
 
 backup()
 {
+touch /tmp/managebackuplog
+chmod 666 /tmp/managebackuplog
 LOG=/tmp/managebackuplog
 echo "========================>`date`<===========================" >> $LOG
 echo "starting the backup........." >> $LOG
