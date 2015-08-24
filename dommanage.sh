@@ -34,7 +34,7 @@ fi
 status() {
 LOG=/var/log/cluster/vmlog
 date >> $LOG
-echo -n $"Checking Status of VMs: "
+echo -n $"Checking Status of VMs: " &>> $LOG
 (virsh list |grep <vm-name-from virsh list>)  &>> $LOG
 RETVAL=$?
 }
