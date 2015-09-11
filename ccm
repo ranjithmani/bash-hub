@@ -1,0 +1,43 @@
+#!/bin/bash
+start()
+{
+HN=$(hostname)
+if [ $HN == "pcs1" ]
+then
+cp -f /root/pcs1 /var/www/html/index.html
+touch /var/run/ccm.pid
+else
+cp -f /root/pcs2 /var/www/html/index.html
+touch /var/run/ccm.pid
+fi
+RETVAL 0
+exit 0
+}
+stop()
+{
+rm -f /var/www/html/index.html
+rm -f /var/run/ccm.pid
+RETVAL 0
+exit 0
+}
+status()
+{
+test -f /var/run/ccm.pid && echo " MNTD service is running " || exit 1
+}
+case "$1" in
+  start)
+  start
+  ;;
+  stop)
+  stop
+  ;;
+  restart)
+  stop
+  start
+  ;;
+  status)
+  status
+  ;;
+  *)
+  echo $"Usage: $0 {start|stop|restart|status}"
+  esac
