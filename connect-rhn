@@ -1,0 +1,60 @@
+#!/bin/bash
+#
+#Description : script to connect server with spacewalk/satellite server
+#
+#USAGE : ./connect-rhn
+#
+#Created by : Ranjith Mani
+#Created on : 17-Sept-2015
+#Prerequsites
+#yum install rhn-client-tools rhn-check rhn-setup rhnsd m2crypto yum-rhn-plugin
+clear
+echo "checking for the pre-requsites...."
+for i in {1..10} ; do echo -ne "." ;sleep 1;done;echo "[Done]"
+sleep 1
+echo "setting up rhn-client repository ...."
+for i in {1..10} ; do echo -ne "." ;sleep 1;done;echo "[Done]"
+sleep 1
+cat > /etc/yum.repos.d/rhnclient.repo <<EOF
+[rhn-client-repo]
+name=rhnclientrepo
+enabled=1
+baseurl=http://192.168.1.30/rhel65
+gpgcheck=0
+EOF
+echo "rhn-client repository has been setup"
+yum clean all
+echo "The RHN client package installation is in progress....."
+sleep 1
+(yum install -y rhn-client-tools rhn-check rhn-setup rhnsd m2crypto yum-rhn-plugin &) && for i in {1..40} ; do echo -ne "." ;sleep 1;done;echo "[Done]"
+echo "The pre-requsites check has been completed successfully.."
+echo "Installing SSL Certificate for Satellite...."
+sleep 1
+rpm -Uvh http://192.168.1.31/pub/rhn-org-trusted-ssl-cert-1.0-1.noarch.rpm
+if [ $? == 0 ]
+then
+{
+echo "The SSL Certifiacte has been installed successfully..!!!"
+}
+else
+{
+echo "There is something went wrong , Please check the connectivity to the satellite."
+}
+fi
+echo "Registering your system with satellite , Please wait this may take some time ....."
+sleep 1
+(rhnreg_ks --serverUrl=https://192.168.1.31/XMLRPC --sslCACert=/usr/share/rhn/RHN-ORG-TRUSTED-SSL-CERT --activationkey=1-355b8125ada5f95354c9af642391a7a6 &) && for i in {1..180} ; do echo -ne "." ;sleep 1;done;echo "[Done]";
+if [ $? == 0 ]
+then
+{
+echo " $(hostname) has successfully registred with satellite ...!!!"
+}
+else
+{
+echo "There is something went wrong , Please check the logs for further errors."
+}
+fi
+echo "cleaningup is in progress........"
+rm -f /etc/yum.repos.d/rhnclient.repo
+sed -i 's/useNoSSLForPackages=0/useNoSSLForPackages=1/' /etc/sysconfig/rhn/up2date
+echo "RHN connect has been completed "
