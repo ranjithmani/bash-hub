@@ -1,0 +1,54 @@
+#!/bin/bash
+check ()
+{
+if [ $(cat $1 | wc -l)  == $(cat $2 | wc -l)  ] 
+then 
+echo " $3 Unchanged ." > green
+else 
+(diff $1 $2 |awk '/</ {print$0 "  <---Missing , please check"}'>red)
+fi
+}
+analyze()
+{
+check "before" "after" "Filesystem"
+check "brt" "art" "Route"
+check "bk" "ak" "Kernel"
+}
+collect()
+{
+if [ $1 == "before" ]
+then
+df -h > before
+netstat -nr > brt
+uname -r > bk
+fi
+if [ $1 == "after" ]
+then
+df -h > after
+netstart -nr > art
+uname -r > ak
+fi
+}
+report()
+{
+for i in $(cat green)
+do 
+echo -e "\033[32m $i" ;tpupt sgr0
+sleep 1
+done
+for i in $(cat red)
+do 
+echo -e "\033[31m $i" ;tpupt sgr0
+sleep 1
+done
+}
+case "$1" in
+	analyze)
+		analyze
+		;; 
+ report)
+ 	report
+	;;
+*)
+echo "usage:....."
+esac
