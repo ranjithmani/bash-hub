@@ -1,54 +1,139 @@
 #!/bin/bash
 check ()
 {
-if [ $(cat $1 | wc -l)  == $(cat $2 | wc -l)  ] 
-then 
-echo " $3 Unchanged ." > green
-else 
-(diff $1 $2 |awk '/</ {print$0 "  <---Missing , please check"}'>red)
+cd /opt/systemcheck/
+diff $1 $2 > /dev/null
+if [ $? == 0 ]
+then
+echo "No changes in $3." >> green
+else
+diff  $1 $2 | awk '/>/ {print$0 " <--- '$3' Missing , please check"}' >> red
+fi
+}
+kern()
+{
+cd /opt/systemcheck/
+diff $1 $2 > /dev/null
+if [ $? == 0 ]
+then
+echo "No changes in kernel" >> green
+else
+echo "Changes in kernel detected...!!" >> red
+echo "$(cat bk) <--Old kernel" >> red
+echo "$(cat ak) <--New kernel" >> red
+fi
+}
+host()
+{
+cd /opt/systemcheck/
+diff $1 $2 > /dev/null
+if [ $? == 0 ]
+then
+echo "No changes in server hostname" >> green
+else
+echo "Changes in hostname  detected...!!" >> red
+echo "$(cat bh) <--Old hostname" >> red
+echo "$(cat ah) <--New hostname" >> red
 fi
 }
 analyze()
 {
+cd /opt/systemcheck/
+test -f after
+if [ $? != 0 ]
+then
+/root/systemcheck collect after
+fi
+
+>red
+>green
 check "before" "after" "Filesystem"
 check "brt" "art" "Route"
-check "bk" "ak" "Kernel"
+kern "bk" "ak"
+host "bh" "ah"
 }
+
 collect()
 {
+test -d /opt/systemcheck || mkdir -p /opt/systemcheck
+cd /opt/systemcheck/
 if [ $1 == "before" ]
 then
 df -h > before
 netstat -nr > brt
 uname -r > bk
+hostname > bh
 fi
 if [ $1 == "after" ]
 then
 df -h > after
-netstart -nr > art
+netstat -nr > art
 uname -r > ak
+hostname > ah
 fi
 }
+
 report()
 {
-for i in $(cat green)
-do 
-echo -e "\033[32m $i" ;tpupt sgr0
-sleep 1
-done
-for i in $(cat red)
-do 
-echo -e "\033[31m $i" ;tpupt sgr0
-sleep 1
-done
+cd /opt/systemcheck/
+echo -en "\033[32m"
+cat green
+echo -en "\033[0m"
+echo -en "\033[33m"
+test -f red && cat red || echo "No problems detected"
+echo -en "\033[0m"
+}
+clean()
+{
+cd /opt/systemcheck/
+rm -f bh ah before after brt art  ak bk red green > /dev/null
+echo "All the files cleaned"
+}
+help()
+{
+echo "Usage: systemcheck [options] ...."
+echo
+echo -e  "\t1.systemcheck collect before --> Collect the system data before reboot"
+echo
+echo -e "\t2.systemcheck collect after --> Collect the system data after reboot"
+echo
+echo -e "\t3.systemcheck analyze --> to analyze the collected data"
+echo
+echo -e "\t4.systemcheck report --> get the report of analyzed data."
+echo
+echo -e "\t5.systemcheck [version|v|V] --> to check the version"
+echo
+echo -e "\t6.systemcheck help --> to print this help menu"
+}
+ver()
+{
+echo "systemcheck  : a program to check the system changes after a reboot"
+echo
+echo "Version      : 1.0"
+echo "Release Date : 30-Sept-2015"
 }
 case "$1" in
-	analyze)
-		analyze
-		;; 
- report)
- 	report
-	;;
-*)
-echo "usage:....."
-esac
+        collect)
+        collect $2
+        ;;
+        analyze)
+        analyze
+        ;;
+        report)
+        report
+        ;;
+        clean)
+        clean
+        ;;
+        v|V|version)
+        ver
+        ;;
+        help)
+        help
+        exit 0
+        ;;
+        *)
+        help
+        exit 1
+        ;;
+        esac
