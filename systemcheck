@@ -36,6 +36,19 @@ echo "$(cat bh) <--Old hostname" >> red
 echo "$(cat ah) <--New hostname" >> red
 fi
 }
+release()
+{
+cd /opt/systemcheck/
+diff $1 $2 > /dev/null
+if [ $? == 0 ]
+then
+echo "No changes in OS Release." >> green
+else
+echo "Changes in OS Release detected...!!" >> red
+echo "$(cat brl) <--Old release version" >> red
+echo "$(cat arl) <--New release version" >> red
+fi
+}
 analyze()
 {
 cd /opt/systemcheck/
@@ -51,6 +64,7 @@ check "before" "after" "Filesystem"
 check "brt" "art" "Route"
 kern "bk" "ak"
 host "bh" "ah"
+release "brl" "arl"
 }
 
 collect()
@@ -63,6 +77,7 @@ df -h > before
 netstat -nr > brt
 uname -r > bk
 hostname > bh
+cat /etc/redhat-release > brl
 fi
 if [ $1 == "after" ]
 then
@@ -70,6 +85,7 @@ df -h > after
 netstat -nr > art
 uname -r > ak
 hostname > ah
+cat /etc/redhat-release > arl
 fi
 }
 
@@ -86,7 +102,7 @@ echo -en "\033[0m"
 clean()
 {
 cd /opt/systemcheck/
-rm -f bh ah before after brt art  ak bk red green > /dev/null
+rm -f arl brl bh ah before after brt art  ak bk red green > /dev/null
 echo "All the files cleaned"
 }
 help()
@@ -112,6 +128,40 @@ echo
 echo "Version      : 1.0"
 echo "Release Date : 30-Sept-2015"
 }
+back()
+{
+cd /opt/systemcheck/
+test -f bh
+if [ $? == 0 ]
+then
+HM=/opt/systemcheck
+test -d backup || mkdir backup
+cd backup
+FILE=backup_$(hostname)_$(date +%d-%m-%Y)
+touch $FILE
+echo "--------------------->`date`<---------------------">>$FILE
+echo "Hostname" >>$FILE
+cat $HM/bh >> $FILE
+echo "=====================" >> $FILE
+echo "Kernel" >>$FILE
+cat $HM/bk >>$FILE
+echo "=====================" >> $FILE
+echo "Release version">>$FILE
+cat $HM/brl >>$FILE
+echo "=====================" >> $FILE
+echo "Fie system" >>$FILE
+cat $HM/before >>$FILE
+echo "=====================" >> $FILE
+echo "Routing table" >>$FILE
+cat $HM/brt >> $FILE
+echo "------------------------------------------------------------------------------------">>$FILE
+echo "Config Backup has been taken..."
+else
+echo "No files to take backup , run 'systemcheck before' and try again"
+exit 3
+fi
+}
+
 case "$1" in
         collect)
         collect $2
@@ -121,6 +171,9 @@ case "$1" in
         ;;
         report)
         report
+        ;;
+        backup)
+        back
         ;;
         clean)
         clean
