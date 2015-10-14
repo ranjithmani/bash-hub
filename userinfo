@@ -1,0 +1,55 @@
+#!/bin/bash
+#user activity collection script
+#The report for the script execution can be found at "/tmp/userinfolog"
+#USAGE : ./userinfo
+#Pre-requsites : bc(binary calculator)
+#
+#Created On : 14-Oct-2015
+#Created by : Ranjith Mani
+LOG=/tmp/userinfolog
+echo "==================================>`date`<=================================" >>$LOG
+awk -F ":" '{if ($3 >= 500) { print $1 } }' /etc/passwd > user.txt
+for i in `cat user.txt`
+do
+#grep $i /var/log/secure | grep Accepted | awk '{print  $1" " $2" "$3 " "  $9 " has logged in from "$11}'
+test -d /userinfo || mkdir /userinfo
+test -d $i || mkdir $i
+cd $i
+test -f odate || date +%s > odate
+test -f oline || cat  /home/$i/.bash_history | wc -l > oline
+D=`stat /home/$i/.bash_history |grep -i change |awk '{print $2" "$3}'|cut -f 1 -d .`
+date -d "$D" +%s > cdate
+CL=`cat  /home/$i/.bash_history | wc -l`
+OL=`cat oline`
+OD=`cat odate`
+CD=`cat cdate`
+if [ $CD == $OD ]
+then
+echo "No activity has been found for user $i ">>$LOG
+elif [ $CD -gt $OD ]
+then
+#Checking for last login info
+grep $i /var/log/secure | grep Accepted | awk '{print $1" "$2" "$3}' >>$LOG
+while read L
+do
+date -d "$L" +%s >>dl.txt
+done < login.txt
+echo "USER ACTIVITY REPORT FOR  $i ">>$LOG
+echo "=================================">>$LOG
+for j in `cat dl.txt`
+do
+if [ $j -gt $OD ]
+then
+PD=`date -d @"$j" | awk '{print $2" "$3" "$4}'`
+grep "$PD" /var/log/secure | grep $i |grep Accepted | awk '{print  $1" " $2" "$3 " "  $9 " has logged in from "$11}'>>$LOG
+fi
+done
+>dl.txt
+LP=`echo "$CL -$OL" |bc`
+echo "the user $i has executed the following commands">>$LOG
+echo "------------------------------------------------">>$LOG
+tail -$LP /home/$i/.bash_history | awk '{print $0}'>>$LOG
+fi
+echo "$CD" > odate
+echo "$CL" > oline
+done
