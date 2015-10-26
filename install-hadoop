@@ -36,9 +36,10 @@ sleep 3
 echo "Installing hadoop"
 tar -zxvf hadoop-2.7.0.tar.gz
 mv hadoop-2.7.0/ hadoop
-mv hadoop-2.7.0/ /usr/local/
+mv hadoop/ /usr/local/
 useradd hadoop
 echo "hadoop123" | passwd hadoop --stdin
+chown -R hadoop:hadoop /usr/local/hadoop/
 touch /etc/hadoop-release
 echo "Apache Hadoop 2.7.0" > /etc/hadoop-release
 cat >> /home/hadoop/.bashrc << EOF
