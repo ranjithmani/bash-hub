@@ -1,0 +1,62 @@
+#!/bin/bash
+#This is a hadoop installation script
+#USAGE : ./install-hadoop
+#Pre-requsites : java , wget and connection to centos/rhel 6.5 yum repository.
+#This script assumes that there is no java and wget installed.
+#if your system having the java , then you can comment the java installation part
+#
+#This script is fully hardcorded , you can alter it for your environment
+#
+#Created By : Ranjith Mani
+#Created On : 26-oct-2015
+clear
+echo "HADOOP INSTALLATION UTILITY"
+echo "==========================="
+test -f /etc/hadoop-release
+if [ $? == 0 ]
+then
+echo "Apache hadoop already installed in this system"
+echo "Installed Version: $(cat /etc/hadoop-release)"
+exit 1
+else
+echo "Installing pre-requesites"
+yum install -y wget > /dev/null
+cd /tmp
+# <------change the server name and path , where you kept the java and hadoop binaries #
+wget http://192.168.1.30/centos65/Packages/jdk-7u79-linux-x64.rpm > /dev/null
+wget http://192.168.1.30/centos65/Packages/hadoop-2.7.0.tar.gz > /dev/null
+# <------change the server name and path , where you kept the java and hadoop binaries #
+yum localinstall -y jdk-7u79-linux-x64.rpm > /dev/null
+java -version > /dev/null
+if [ $? == 0 ]
+then
+echo "Java 1.7.9 has been installed."
+fi
+sleep 3
+echo "Installing hadoop"
+tar -zxvf hadoop-2.7.0.tar.gz
+mv hadoop-2.7.0/ hadoop
+mv hadoop-2.7.0/ /usr/local/
+useradd hadoop
+echo "hadoop123" | passwd hadoop --stdin
+touch /etc/hadoop-release
+echo "Apache Hadoop 2.7.0" > /etc/hadoop-release
+cat >> /home/hadoop/.bashrc << EOF
+export JAVA_HOME=/usr/java/jdk1.7.0_79
+export HADOOP_HOME=/usr/local/hadoop
+export HADOOP_INSTALL=$HADOOP_HOME
+export HADOOP_MAPRED_HOME=$HADOOP_HOME
+export HADOOP_COMMON_HOME=$HADOOP_HOME
+export HADOOP_HDFS_HOME=$HADOOP_HOME
+export YARN_HOME=$HADOOP_HOME
+export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
+export PATH=$PATH:$HADOOP_HOME/sbin:$HADOOP_HOME/bin
+EOF
+echo "hadoop installation completed."
+echo "Cleaning up the packages"
+cd /tmp
+rm -f jdk-7u79-linux-x64.rpm
+rm -rf hadoop*
+echo "Done."
+fi
+exit 0
