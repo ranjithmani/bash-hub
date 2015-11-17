@@ -19,8 +19,8 @@ fi
 else
 clear
 echo "No LSB_RELEASE package installed, select the OS release manually."
-echo -e "\t 1.Redhat"
-echo -e "\t 2.Oracle"
+echo -e "\t Redhat"
+echo -e "\t Oracle"
 echo "please enter the OS:"
 read OS
 fi
