@@ -4,16 +4,26 @@
 #Pre-requisite : lsb_release binary
 #Created on : 11-Nov-2015
 #Created By : Ranjith Mani
+which lsb_release > /dev/null 2>&1
+if [ $? = 0 ]
+then
 INI=`lsb_release -d | awk '{print $2}'`
 if [ $INI = "Red" ]
-then 
+then
 OS=`lsb_release -d | awk '{print $2$3}'`
 RELEASE=`lsb_release -d | awk '{print $8}'|cut -f1 -d .`
 else
 RELEASE=`lsb_release -d | awk '{print $4}'|cut -f1 -d .`
 OS=`lsb_release -d | awk '{print $2}'`
 fi
-
+else
+clear
+echo "No LSB_RELEASE package installed, select the OS release manually."
+echo -e "\t 1.Redhat"
+echo -e "\t 2.Oracle"
+echo "please enter the OS:"
+read OS
+fi
 
 oracle ()
 {
@@ -62,12 +72,12 @@ EOF
 echo "Repo has been set for $OS Enterprise Linux 6"
 fi
 }
-# see how the functions are called.
+#See how the functions are called .
 case $OS in
-        Oracle)
+       oracle|Oracle)
         oracle
         ;;
-        RedHat)
+        Redhat|redhat|RedHat)
         redhat
         ;;
         *)
