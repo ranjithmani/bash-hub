@@ -19,8 +19,9 @@ fi
 else
 clear
 echo "No LSB_RELEASE package installed, select the OS release manually."
-echo -e "\t Redhat"
-echo -e "\t Oracle"
+echo -e "\t *Redhat"
+echo -e "\t *Oracle"
+echo -e "\t Quit"
 echo "please enter the OS:"
 read OS
 fi
@@ -79,6 +80,9 @@ case $OS in
         ;;
         Redhat|redhat|RedHat)
         redhat
+        ;;
+        Q|q|Quit|quit)
+        exit 4
         ;;
         *)
         echo "Repo not available for `lsb_release -d | awk -F ":" '{print $2}'` "
