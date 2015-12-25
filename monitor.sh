@@ -23,7 +23,9 @@ echo " DISK UTILIZATION" >> $LOG
 echo "------------------------------------------------------------------------------------" >> $LOG
 sar 1 5  |tail -7 | awk '{print $4"  "$5"  "$6"  "$6"  "$7"  "$8"  "$9}' | column -t | head -6 >> $LOG
 echo "------------------------------------------------------------------------------------" >> $LOG
+echo >> $LOG
+iostat -x 1 5 |grep dm |sort >> $LOG
 IT=$((IT + 1))
 done
-echo " Log collection has been completed , you can find log on "/tmp/monitorlog" ."
+echo " Log collection has been completed , you can find log on "/tmp/monitorlogs" ."
 exit 0
