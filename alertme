@@ -1,0 +1,21 @@
+#!/bin/bash
+#basic script to inform about the battery status
+while true
+do
+if [ `cat /sys/class/power_supply/AC/online` = 0 ]
+then 
+if [ `cat /sys/class/power_supply/BAT0/capacity` -lt 20 ]
+then
+echo " Battery. Low. , Please Connect the charger " |espeak
+fi
+fi
+if [ `cat /sys/class/power_supply/AC/online` = 1 ]
+then 
+if [ `cat /sys/class/power_supply/BAT0/capacity` = 100 ]
+then
+echo " Battery. Full. , Please Remove the charger" | espeak
+fi
+fi
+sleep 1
+done
+
