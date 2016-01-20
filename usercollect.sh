@@ -4,27 +4,34 @@
 # * Normal user list , usually more than 500 UID 
 # * User Last login detals
 # * User status , active or locked 
-# * Whether the user is available in sudo list 
 # USAGE : ./usercollect.sh
 #
+DATA=/tmp/yblent.txt
+echo "Hostname :`uname -n`" >> $DATA
+echo "IP Address :`ifconfig|grep inet |grep -v inet6|grep -v 127.0.0.1|awk '{print $2}'|cut -f 2 -d :`" >> $DATA
+which lsb_release > /dev/null 2>&1
+if [ $? == 0 ]
+then
+echo "OS Version :`lsb_release -d`" >>$DATA
+else
+echo "OS Version :`cat /etc/redhat-release`" >>$DATA
+fi
 awk -F: '{if ($3 >= 500) { print $1 } }' /etc/passwd > user.txt
-UTOT=`cat user.txt |wc -l`
-echo " Collecting user details in `hostname` .........."
+echo "collecting user data....."
+echo "=========> USER DETAILS <=========" >>$DATA
 sleep 2
 for i in `cat user.txt`
 do
-echo "==================> User Report for $i ===========================" >> /tmp/userreport.txt
-echo "Username : $i" >> /tmp/userreport.txt
-ID=`grep  $i /etc/passwd | cut -f 3 -d : `
-echo "User ID  : $ID" >> /tmp/userreport.txt
-ULAST=`last $i | head -1`
-echo " Last login : $ULAST " >> /tmp/userreport.txt
-USTAT=`passwd -S $i`
-echo " User Status :$USTAT " >> /tmp/userreport.txt
-USUD=`grep $i /etc/sudoers`
-echo " Sudo status : $USUD " >> /tmp/userreport.txt
-echo "========================================================================" >> /tmp/userreport.txt
+echo "Username:$i"  >>$DATA
+echo "UserID:`grep $i /etc/passwd |cut -f 3 -d :`" >> $DATA
+echo "LastLogin:`last $i |head -1|awk '{print $4" "$5" "$6" "$7" "$8" "$9" "$10}'`" >> $DATA
+if [ `passwd -S $i|awk '{print $2}' ` == LK ]
+then
+echo "User status : Locked" >> $DATA
+else
+echo "User status : Active" >> $DATA
+fi
+echo "----------------------------------" >>$DATA
 done
-echo " Total Number of users =====> $UTOT " >> /tmp/userreport.txt
-echo " Please find the report at /tmp/userreport.txt "
-exit 0
+echo "Details can be found @ /tmp/yblent.txt "
+rm -f user.txt
