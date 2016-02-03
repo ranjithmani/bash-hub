@@ -1,0 +1,73 @@
+#!/bin/bash
+# * To create bulk users and assign password and add it to SUDO
+# * add the list of user in below format
+#  userID:userNAME:secondaryGROUP:
+# Created By : Ranjith Mani
+# Created On : 3-Feb-2016
+clear
+echo
+function grpadd()
+{
+groupadd L1
+groupadd L2
+groupadd L3
+echo "L1 , L2 and L3 groups are created ."
+sleep 2
+cat > name.txt <<EOF
+USER:Name :L1:
+USER1:user name:L2:
+esd:kcdfd:L3:
+EOF
+}
+function usradd()
+{
+for i in `cat name.txt|awk -F ":" '{print $1}'`
+do
+UI=`grep $i name.txt|awk -F ":" '{print $1}'`
+GI=`grep $i name.txt|awk -F ":" '{print $2}'`
+GP=`grep $i name.txt|awk -F ":" '{print $3}'`
+#echo $UI
+SGI=`echo "\"$GI\""`
+#echo $SGI
+#echo $GP
+useradd -c "$GI" -G $GP $UI
+echo "User $UI has been created for $GI."
+sleep 1
+id $UI
+echo "password" | passwd $UI --stdin 
+echo "------------------------------------------------------------------"
+done
+rm -f name.txt
+}
+function sudoit()
+{
+echo
+echo
+echo "going to implement SUDO for all the users ........"
+sleep 3
+cp /etc/sudoers /etc/sudoers_bkp_`date +%h`
+grep -w LINUX_ADMIN_MEMBERS /etc/sudoers
+if [ $? == 0 ]
+then
+echo "Sudo already implemented for SNXT LINUX users"
+else
+cat >> /etc/sudoers <<EOF
+########################### LINUX_ADMIN_MEMBERS ################################
+Cmnd_Alias NSU = /bin/su
+
+
+Cmnd_Alias BASIC = /usr/bin/w, /bin/grep, /bin/egrep, /bin/cat, /bin/date, /bin/ls, /usr/bin/head, /bin/more,/usr/bin/less, /usr/bin/top,  /usr/sbin/ntpq,  /usr/bin/tail, /bin/df, /usr/bin/du, /bin/hostname, /bin/ping, /bin/pwd, /bin/uname, /usr/sbin/dmidecode, /usr/sbin/lsof, /usr/sbin/mtr, /usr/sbin/lvdisplay, /usr/sbin/vgdisplay, /usr/sbin/sestatus, /usr/sbin/nfsstat, /usr/sbin/pvdisplay, /usr/sbin/pvs, /usr/sbin/vgs, /usr/sbin/lvs, /usr/sbin/getenforce, /sbin/ifconfig, /usr/bin/mailq, /usr/kerberos/bin/telnet, /bin/traceroute, /bin/netstat, /usr/sbin/tcpdump, /bin/ps, /bin/echo, /sbin/ethtool, /usr/bin/vmstat, /usr/bin/sar, /usr/bin/nmap, /usr/bin/pmap, /usr/bin/uptime, /usr/bin/last, /bin/dmesg, /sbin/lspci, /sbin/kudzu, /usr/bin/cal, /usr/bin/clear, /usr/bin/diff, /usr/bin/dig, /usr/bin/elinks, /usr/bin/file, /usr/bin/find, /usr/bin/firefox,/usr/bin/host, /usr/bin/lastlog, /usr/bin/locate, /usr/bin/lsattr, /usr/bin/man, /usr/bin/mutt, /usr/bin/nslookup, /usr/bin/ntpstat, /sbin/route, /usr/bin/pstree, /usr/bin/wc, /usr/bin/who, /usr/bin/whatis, /usr/bin/whereis, /usr/bin/whoami, /usr/sbin/ntptime, /sbin/ntpdate, /usr/sbin/showmount, /usr/bin/iostat, /usr/bin/stat, /usr/bin/sar, /bin/tar, /usr/bin/crontab, /usr/bin/diff, /usr/bin/free, /usr/bin/gedit, /usr/bin/getconf, /usr/bin/getfacl, /usr/bin/passwd, /usr/bin/last, /usr/bin/nohup, /usr/bin/scp, /usr/bin/ssh, /usr/bin/unzip, /usr/bin/uptime, /usr/bin/wget
+
+
+Cmnd_Alias L2COMMANDS = /usr/bin/w, /bin/grep, /bin/egrep, /bin/cat, /bin/date, /bin/ls, /usr/bin/head, /bin/more,/usr/bin/less, /usr/bin/top,  /usr/sbin/ntpq,  /usr/bin/tail, /bin/df, /usr/bin/du, /bin/hostname, /bin/ping, /bin/pwd, /bin/uname, /usr/sbin/dmidecode, /usr/sbin/lsof, /usr/sbin/mtr, /usr/sbin/lvdisplay, /usr/sbin/vgdisplay, /usr/sbin/sestatus, /usr/sbin/nfsstat, /usr/sbin/pvdisplay, /usr/sbin/pvs, /usr/sbin/vgs, /usr/sbin/lvs, /usr/sbin/getenforce, /sbin/ifconfig, /usr/bin/mailq, /usr/kerberos/bin/telnet, /bin/traceroute, /bin/netstat, /usr/sbin/tcpdump, /bin/ps, /bin/echo, /sbin/ethtool, /usr/bin/vmstat, /usr/bin/sar, /usr/bin/nmap, /usr/bin/pmap, /usr/bin/uptime, /usr/bin/last, /bin/dmesg, /sbin/lspci, /sbin/iptables, /sbin/kudzu, /usr/bin/cal, /usr/bin/clear, /usr/bin/diff, /usr/bin/dig, /usr/bin/elinks, /usr/bin/file, /usr/bin/find, /usr/bin/firefox,/usr/bin/host, /usr/bin/lastlog, /usr/bin/locate, /usr/bin/lsattr, /usr/bin/man, /usr/bin/mutt, /usr/bin/nslookup, /usr/bin/ntpstat, /sbin/route, /usr/bin/pstree, /usr/bin/wc, /usr/bin/who, /usr/bin/whatis, /usr/bin/whereis, /usr/bin/whoami, /usr/sbin/ntptime, /sbin/ntpdate, /usr/sbin/rpcinfo, /usr/sbin/showmount, /usr/sbin/smartctl, /usr/bin/iostat, /bin/kill, /usr/bin/stat, /usr/bin/sar, /bin/tar, /usr/bin/chcon, /usr/bin/chage, /usr/bin/crontab, /usr/bin/diff, /usr/bin/free, /usr/bin/gedit, /usr/bin/getconf, /usr/bin/getfacl, /usr/bin/setfacl, /usr/bin/passwd, /usr/bin/last, /usr/bin/nohup, /usr/bin/pkill, /usr/bin/scp, /usr/bin/ssh, /usr/bin/unzip, /usr/bin/uptime, /usr/bin/wget, /usr/bin/reboot, /sbin/shutdown, /bin/rm
+
+%L1	ALL=(ALL)	NOPASSWD:BASIC, !NSU
+%L2	ALL=(ALL)	NOPASSWD:BASIC, L2COMMANDS, !NSU
+%L3	ALL=(ALL)	ALL
+EOF
+echo "SUDO has been implemented.!!!"
+fi
+}
+grpadd
+usradd
+sudoit
