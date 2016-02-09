@@ -1,0 +1,30 @@
+#!/bin/bash
+
+RDAYS=30
+
+function rotate()
+{
+
+        cd /var/log/cfg2html/
+
+        ls > rotate.txt
+
+        while read FILE
+        do
+                TDATE=`date +%s`
+                CDATE=`stat -c %Y $FILE`
+                DIFF=$(( 86400 * ${RDAYS} ))
+
+                ISDEL=$(( TDATE - CDATE ))
+
+                if [ $DIFF -le $ISDEL ]
+                then
+                        rm -rvf $FILE > /dev/null
+                fi
+
+        done < rotate.txt
+
+rm -f rotate.txt > /dev/null
+
+}
+rotate
