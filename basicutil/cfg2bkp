@@ -1,0 +1,14 @@
+#!/bin/bash
+#USAGE : to start the cfg2html 
+#
+test -d /var/log/cfg2html || mkdir -p /var/log/cfg2html
+cd /var/log/cfg2html
+LOG=/var/log/cfg2html/cfg2bkp.log
+mkdir `hostname -s`-`date +%d"-"%m"-"%Y` && cd `hostname -s`-`date +%d"-"%m"-"%Y`
+echo "$(date +%D"-"%T):Cfg backup started." >> $LOG
+cfg2html > /dev/null 2>&1
+cd ..
+tar -zcvf `hostname -s`-`date +%d"-"%m"-"%Y`.tar.gz `hostname -s`-`date +%d"-"%m"-"%Y`/ > /dev/null 2>&1
+rm -rf `hostname -s`-`date +%d"-"%m"-"%Y` 
+echo "$(date +%D"-"%T):Cfg backup completed successfully." >> $LOG
+exit 0
