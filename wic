@@ -10,19 +10,19 @@ myip=`ifconfig wlan|grep inet|awk '{print $2}'|awk -F ":" '{print $2}'`
 myrt=192.168.0.1
 nmap -sP 192.168.0.1-254 > iplist
 if [ `cat iplist |grep "Nmap scan report" |awk '{print $5}'|wc -l` == 2 ]
-theen
-clear
-echo "Ah, no one connected except you...!!!"
-rm -f iplist
-else
-echo "List of Hosts which connected to your Network"
-for i in `cat iplist |grep "Nmap scan report" |awk '{print $5}'`
-do
-if [[ $i != $myip && $i != $myrt ]]
-then
-echo "Host with ip $i connected."
-fi
-done
-rm -f iplist
+	theen
+	clear
+	echo "Ah, no one connected except you...!!!"
+	rm -f iplist
+	else
+			echo "List of Hosts which connected to your Network"
+					for i in `cat iplist |grep "Nmap scan report" |awk '{print $5}'`
+					do
+					if [[ $i != $myip && $i != $myrt ]]
+						then
+						echo "Host with ip $i connected."
+					fi
+					done
+	rm -f iplist
 fi 
 
