@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+###### Set the below values as per your Env. ###
 SNAP_SIZE=1G
 SNAP_LV=lv_root
 SNAP_VG=vg_master
@@ -7,6 +8,7 @@ SNAP_MNT_DIR=/rootsnap
 SNAP_NAME=rootsnap
 NFS_DIR=/mnt
 LOG=/root/snapbackup.log
+################################################
 #
 #
 if [ `id -u` != 0 ]
@@ -52,7 +54,7 @@ if [ $? != 0 ]
 fi
 test -d  $NFS_DIR/`hostname`/rootsnapbkp_`date +%d"-"%h"-"%Y` || mkdir -p $NFS_DIR/`hostname`/rootsnapbkp_`date +%d"-"%h"-"%Y`
 cd $NFS_DIR/`hostname`/rootsnapbkp_`date +%d"-"%h"-"%Y`
-echo "Starting the snapshot backup , please wait" |tee  $LOG
+echo "Starting the snapshot backup , please wait" >>  $LOG
 tar -pzcf root_backup.tar.gz $SNAP_MNT_DIR  > /dev/null 2>&1
 if [ $? == 0 ]
    then
