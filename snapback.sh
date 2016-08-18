@@ -4,7 +4,7 @@
 #Author : Ranjith Mani
 #Created on : 5-Aug-2016
 #
-###### Set the below values as per your Env. ###
+####### Set the below values as per your Env.######
 SNAP_SIZE=1G
 SNAP_LV=lv_root
 SNAP_VG=vg_master
