@@ -1,0 +1,12 @@
+#!/bin/bash
+LOG=~/lnxhard.log
+if [ `sysctl -a |grep kernel.randomize_va_space|awk '{print $3}'` != 1 ]
+then
+sysctl -w kernel.randomize_va_space=1
+fi
+
+if [ `sysctl -a |grep kernel.exec-shield|awk '{print $3}'` != 1 ]
+then
+sysctl -w kernel.exec-shield=1
+fi
+echo "`date +%T"-"%D`:kernel security enabled." >>$LOG
