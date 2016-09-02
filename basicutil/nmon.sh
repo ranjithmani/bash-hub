@@ -1,6 +1,6 @@
 #!/bin/bash
 # USAGE: To rotate and start nmon capture 
-# script created : Shamelessly copied from sandeep script.
+# script created : Shamelessly copied from someones script.
 RDAYS=30
 
 function rotate()
