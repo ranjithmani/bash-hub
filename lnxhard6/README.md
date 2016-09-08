@@ -16,3 +16,4 @@ DESCRIPTION: Currently the script will harden the following security measure.
 10. Disable CTRL+ALT+DELETE
 11. Enable sudo logs
 12. Enable MOTD
+ 
