@@ -1,3 +1,8 @@
+            LINUX HARDENING SCRIPT FOR RHEL/CENTOS/OEL 6X
+            
+USAGE: ./start.sh
+
+DESCRIPTION: Currently the script will harden the following security measure.
 1.  Disable Unwanted SUID and SGID Binaries
 2.  Stopping unwanted services
 3.  Setting password ageing policy for users
