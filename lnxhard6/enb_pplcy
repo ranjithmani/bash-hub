@@ -1,0 +1,8 @@
+#!/bin/bash
+LOG=~/lnxhard.log
+cp -pr  /etc/login.defs /etc/login.defs_BKP
+sed -i '/^'PASS_MAX_DAYS'/ c'PASS_MAX_DAYS\ 45 /etc/login.defs
+sed -i '/^'PASS_MIN_DAYS'/ c'PASS_MIN_DAYS\ 1 /etc/login.defs
+sed -i '/^'PASS_MIN_LEN'/ c'PASS_MIN_LEN\ 5 /etc/login.defs
+sed -i '/^'PASS_WARN_AGE'/ c'PASS_WARN_AGE\ 7 /etc/login.defs
+echo "`date +%D"-"%T`:password policy has been set." >>$LOG
