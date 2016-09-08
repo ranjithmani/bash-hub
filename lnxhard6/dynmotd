@@ -1,0 +1,44 @@
+PROCCOUNT=`ps -Afl | wc -l`
+PROCCOUNT=`expr $PROCCOUNT - 5`
+GROUPZ=`groups`
+USER=`whoami`
+IMPSERVICE="CRON, NETWORK and SSH"
+
+if [[ $GROUPZ == *rac* ]]; then
+ENDSESSION=`cat /etc/security/limits.conf | grep "@oracle" | grep maxlogins | awk {'print $4'}`
+PRIVLAGED="Oracle Account"
+elif [[ $GROUPZ == *root* ]]; then
+ENDSESSION="Unlimited"
+PRIVLAGED="SuperUser"
+else
+ENDSESSION="Unlimited"
+PRIVLAGED="Regular User"
+fi
+
+clear
+echo -e "\033[1;32m
+
+\033[0;35m+++++++++++++++++++++++++++: \033[0;37mSystem Data\033[0;35m :++++++++++++++++++++++++++++++++++++++
+\033[0;37mHostname \033[0;35m= \033[1;32m`hostname`
+ \033[0;37mAddress \033[0;35m= \033[1;32m`/sbin/ifconfig | grep inet | head -n 1 | awk '{print $2}' `
+  \033[0;37mKernel \033[0;35m= \033[1;32m`uname -r`+
+  \033[0;37mUptime \033[0;35m= \033[1;32m`uptime | awk -F"," '{print $1}' | sed 's|^\ ||'`
+     \033[0;37mCPU \033[0;35m= \033[1;32m`cat /proc/cpuinfo | grep -F processor | wc -l`x`cat /proc/cpuinfo | grep -F "model name" | head -n 1 | awk -F":" '{print $2}'`
+    \033[0;37mLoad \033[0;35m= \033[1;32m`uptime | awk -F"," '{print $4$5$6}' | awk '{print $3" (1 min) "$4" (5 min) "$5" (15 min)"}'| sed 's|^\ ||'`
+  \033[0;37mMemory \033[0;35m= \033[1;36mTotalMem: \033[1;32m`cat /proc/meminfo | grep -F MemTotal | awk '{print $2" "$3}'` \033[1;34mFreeMem: \033[1;32m`free | sed -n '3p' | rev | awk '{print $1}'| rev` kB
+    \033[0;37mSwap \033[0;35m= \033[1;39mTotalSwap: \033[1;32m`cat /proc/meminfo | grep -F SwapTotal: | awk '{print $2" "$3}'` \033[1;34mFreeSwap: \033[1;32m`cat /proc/meminfo | grep -F SwapFree: | awk '{print $2" "$3}'`
+\033[0;35m++++++++++++++++++++++++++: \033[0;37mUser Data\033[0;35m :+++++++++++++++++++++++++++++++++++++++++
+  \033[0;37mUsername \033[0;35m= \033[1;32m$USER
+ \033[0;37mPrivlages \033[0;35m= \033[1;32m$PRIVLAGED
+\033[0;37mLast Login \033[0;35m= \033[1;32m`last | grep $USER | sed -n '1p' | cut -c40-55` from `last | grep $USER | sed -n '1p' | awk '{print $3}'`
+  \033[0;37mSessions \033[0;35m= \033[1;32m`who | grep $USER | wc -l` of $ENDSESSION MAX
+ \033[0;37mProcesses \033[0;35m= \033[1;32m$PROCCOUNT of `ulimit -u` MAX
+\033[0;35m+++++++++++++++++++++++++: \033[0;37mHelpful Information\033[0;35m :++++++++++++++++++++++++++++++++
+  \033[0;37mSSH Logins \033[0;35m= \033[1;32m`who | grep pts | wc -l`
+\033[0;37mIMP Services \033[0;35m= \033[1;32m$IMPSERVICE
+   \033[0;37mBox Admin \033[0;35m= \033[1;32msnxt-linux@wipro.com
+\033[0;35m++++++++++++++++++++++++: \033[0;31mMaintenance Information\033[0;35m :+++++++++++++++++++++++++++++
+\033[0;31m Take system backup before making any move.
+\033[0;35m++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+\033[0;37m"
+
