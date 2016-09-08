@@ -1,0 +1,4 @@
+#!/bin/bash
+LOG=~/lnxhard.log
+sed -i.bak 's/id:5:initdefault:/id:3:initdefault:/' /etc/inittab
+echo "`date +%D"-"%T`:GUI has been disabled." >>$LOG
