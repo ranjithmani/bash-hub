@@ -1,0 +1,5 @@
+#!/bin/bash
+LOG=~/lnxhard.log
+cp -f /etc/init/control-alt-delete.conf /etc/init/control-alt-delete.override
+cp -f ./control-alt-delete.conf /etc/init/control-alt-delete.conf
+echo "`date +%D"-"%T`:Disable CTRL+ALT_DELETE." >>$LOG
