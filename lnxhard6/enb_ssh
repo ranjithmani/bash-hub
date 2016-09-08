@@ -1,0 +1,9 @@
+#!/bin/bash
+LOG=~/lnxhard.log
+grep -Ev '^#|^$' /etc/ssh/sshd_config |grep ClientAliveInterval >/dev/null 2>&1
+if [ $? != 0 ]
+        then
+        echo "ClientAliveInterval 300" >> /etc/ssh/sshd_config
+        echo "ClientAliveCountMax 0" >> /etc/ssh/sshd_config
+        echo "`date +%D"-"%T`:SSH Parameters has been set." >>$LOG
+fi
