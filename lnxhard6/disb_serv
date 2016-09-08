@@ -4,4 +4,4 @@ for i in lvm2-monitor netfs rhsmcertd
 do
 chkconfig $i off
 done
-echo "`date +%T"-"%D`:unwanted services disabled ." >>$LOG
+echo "`date +%D"-"%T`:unwanted services disabled ." >>$LOG
