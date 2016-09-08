@@ -1,0 +1,9 @@
+#!/bin/bash
+LOG=~/lnxhard.log
+grep dynmotd /etc/profile >/dev/null 2>&1
+if [ $? != 0 ]
+then
+test -f /usr/local/bin/dynmotd || cp -pf ./dynmotd /usr/local/bin/dynmotd
+echo "/usr/local/bin/dynmotd" >> /etc/profile
+echo "`date +%D"-"%T`:Dynamic motd enabled." >>$LOG
+fi
