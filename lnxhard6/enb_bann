@@ -1,0 +1,11 @@
+#!/bin/bash
+LOG=~/lnxhard.log
+grep Banner /etc/ssh/sshd_config |grep -vE ^# || grep Banner /etc/ssh/sshd_config|grep 'Banner /etc/banner' > /dev/null 2>&1
+if [ $?  == 1 ]
+then
+sed -i 's/#Banner none/Banner \/etc\/banner/' /etc/ssh/sshd_config
+test -f /etc/banner || touch /etc/banner
+cp -f ./banner /etc/banner
+echo "`date +%D"-"%T`:Banner has been set." >>$LOG
+fi
+cp -f ./banner /etc/banner
