@@ -1,5 +1,7 @@
 #!/bin/bash
 #basic script to inform about the battery status
+#dependency: epeak package required
+#schedule this scrit in /etc/rc.local and iterarte it for 
 while true
 do
 if [ `cat /sys/class/power_supply/AC/online` = 0 ]
