@@ -1,0 +1,88 @@
+#!/bin/bash
+#
+#Utility to get the running guest vms in a XEN host (more human readable :-))
+#It is a pretty basic script , feel free to edit the script if you found any bug  ( !!! )
+#Author : Ranjith Mani
+#Date   : 10 - Mar - 2017
+#Version: 1
+if [ -z $1 ]
+then
+echo -e "Usage: vm [options][options]...\n\nAvailable Options:\nlist\t--->listing vms\nlistall\t--->listing vms with UIDs\nlistinfo--->Listing vms info with [CPU|Memory|os|domain]\nlistlun --->Listing the LUNs assigned to vm"
+exit 1
+elif [ $1 == list ]
+then
+bold=`tput bold`
+echo -e "${bold} VirtualMachine\t\t\tState\e[0m"
+for i in $(xm list |grep -vE '^Domain|Name'|awk '{print $1}')
+do
+grep -i simple `grep -r $i /OVS/Repositories/*/VirtualMachines/*|awk -F":" '{print $1}'` | awk -F"=" '{print $2,"\t\t" "Running"}'
+done
+elif [ $1 == listall ]
+then
+bold=`tput bold`
+echo -e "${bold} VirtualMachine\t\t\tUID\t\t\t\t\tID\tState\e[0m"
+for i in $(xm list |grep -vE '^Domain|Name'|awk '{print $1}')
+do
+ID=$(xm list |grep -vE 'Name|Domain'|grep $i| awk '{print $2}')
+XU=$(xm list|grep $i |awk '{print $1}')
+NAME=$(grep -i simple `grep -r $i /OVS/Repositories/*/VirtualMachines/*|awk -F":" '{print $1}'` | awk  -F"=" '{print $2}')
+echo -e "$NAME\t\t$XU\t$ID\tRunning"
+done
+elif [ $1 == listinfo ]
+then
+if [ -z $2 ]
+then
+echo -e "Choose sub commands for listinfo [cpu|memory|os|domain]"
+exit 3
+fi
+if [ $2 == "cpu" ] || [ $2 == "memory" ]
+then
+bold=`tput bold`
+echo -e "${bold} VirtualMachine\t\t\tUID\t\t\t\t\tID\tCPU\tMemory\tState\e[0m"
+for i in $(xm list |grep -vE '^Domain|Name'|awk '{print $1}')
+do
+ID=$(xm list |grep -vE 'Name|Domain'|grep $i| awk '{print $2}')
+XU=$(xm list|grep $i |awk '{print $1}')
+NAME=$(grep -i simple `grep -r $i /OVS/Repositories/*/VirtualMachines/*|awk -F":" '{print $1}'` | awk  -F"=" '{print $2}')
+CPU=$(xm list|grep $i |awk '{print $4}')
+MEM=$(xm list|grep $i |awk '{print $3}')
+echo -e "$NAME\t\t$XU\t$ID\t$CPU\t$MEM\tRunning"
+done
+elif [ $2 == "os" ]
+then
+bold=`tput bold`
+echo -e "${bold} VirtualMachine\t\t\tUID\t\t\t\t\tID\t OS_Type\t Guest_OS\e[0m"
+for i in $(xm list |grep -vE '^Domain|Name'|awk '{print $1}')
+do
+ID=$(xm list |grep -vE 'Name|Domain'|grep $i| awk '{print $2}')
+XU=$(xm list|grep $i |awk '{print $1}')
+NAME=$(grep -i simple `grep -r $i /OVS/Repositories/*/VirtualMachines/*|awk -F":" '{print $1}'` | awk  -F"=" '{print $2}')
+XOT=$(grep -i guest_os_type `grep -r $i /OVS/Repositories/*/VirtualMachines/*|awk -F":" '{print $1}'` | awk  -F"=" '{print $2}')
+XOS=$(grep -i OVM_os_type `grep -r $i /OVS/Repositories/*/VirtualMachines/*|awk -F":" '{print $1}'` | awk  -F"=" '{print $2}')
+echo -e "$NAME\t\t$XU\t$ID\t$XOT\t$XOS"
+done
+elif [ $2 == "domain" ]
+then
+bold=`tput bold`
+echo -e "${bold} VirtualMachine\t\t\tUID\t\t\t\t\tID\t Domain_Type\e[0m"
+for i in $(xm list |grep -vE '^Domain|Name'|awk '{print $1}')
+do
+ID=$(xm list |grep -vE 'Name|Domain'|grep $i| awk '{print $2}')
+XU=$(xm list|grep $i |awk '{print $1}')
+NAME=$(grep -i simple `grep -r $i /OVS/Repositories/*/VirtualMachines/*|awk -F":" '{print $1}'` | awk  -F"=" '{print $2}')
+XOD=$(grep -i OVM_domain_type `grep -r $i /OVS/Repositories/*/VirtualMachines/*|awk -F":" '{print $1}'` | awk  -F"=" '{print $2}')
+echo -e "$NAME\t\t$XU\t$ID\t$XOD"
+done
+else
+echo -e "Choose sub commands for listinfo [cpu|memory|os|domain]"
+fi
+elif [ $1 == listlun ]
+then
+echo -n "Enter the UID of the server:"
+read  servid
+cat /OVS/Repositories/*/VirtualMachines/$servid/vm.cfg |grep disk |awk -F"=" '{print $2}'|fold -s|grep phy|awk -F"/" '{print $4}'|awk -F"," '{print $1 " ---> "$2}'
+elif [ $1 != list ] || [ $1 == "help" ]
+then
+echo -e "Usage: vm [options][options]...\n\nAvailable Options:\nlist\t--->listing vms\nlistall\t--->listing vms with UIDs\nlistinfo--->Listing vms info with [CPU|Memory|os|domain]\nlistlun --->Listing the LUNs assigned to vm"
+exit 2
+fi
