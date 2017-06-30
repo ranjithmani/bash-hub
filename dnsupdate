@@ -1,0 +1,39 @@
+#!/bin/bash
+#script to update DNS zones
+#provide FQDN and IP address as input of this command
+#EXAMPLE: dnsupdate myserver.mydomain 10.10.10.10
+#Author : Ranjith Mani
+#Date: 30-June-2017
+fqdn=$1
+ip=$2
+REV=/var/named/chroot/var/named/reverse.local
+FWD=/var/named/chroot/var/named/forward.local
+#do validation of inputs
+chkip=`for i in {1..4} ; do echo $ip |awk -F"." '{print $'$i' }' ; done|grep -Ev '^$' |wc -l`
+chkfqdn=`for i in {1..4} ; do echo $fqdn |awk -F"." '{print $'$i' }' ; done|grep -Ev '^$' |wc -l`
+if [ $chkip -lt 4 ] || [ $chkfqdn -lt 3 ]
+then
+echo "Enter a valid IP and FQDN"
+exit 1
+fi
+# validation ends here
+#take backup of zones before performing update
+cp -p $FWD $FWD-bkp.local`date +%d%m%y`
+cp -p $REV $REV-bkp.local`date +%d%m%y`
+RS=`cat $REV | awk '/serial/ {print $1}'`
+FS=`cat $FWD | awk '/serial/ {print $1}'`
+#update the zone
+echo "Updating A record ....."
+host=`echo $fqdn |awk -F"." '{print $1}'`
+echo -e "$host\t\tIN\tA\t$ip" >> $FWD
+NFS=`expr $FS + 1`
+sed -i "4s/$FS/$NFS/" $FWD
+echo "Updating PTR record....."
+sleep 1
+foct=`echo $ip | awk -F"." '{print $4}'`
+echo -e "$foct\t\tIN\tPTR\t$fqdn." >> $REV
+NRS=`expr $RS + 1`
+sed -i "4s/$RS/$NRS/" $REV
+rndc reload > /dev/null 2>&1
+echo "Zone Update complted..."
+exit 0
