@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+# nrped          Start up the NRPE on 5666 port
+# chkconfig: 2345 55 25
+# processname: nrped
+NRPE=/opt/app/nrpe-2.12/bin/nrpe
+NRPE_CONFIG=/opt/app/nrpe-2.12/etc/nrpe.cfg
+PID=/var/run/nrpe.pid
+
+start()
+{
+ $NRPE -n -c $NRPE_CONFIG -d 2>&1 | logger && echo -e "Starting the NRPE.......\033[32m [OK]"; tput sgr0
+}
+
+stop()
+ {
+ test -f "$PID" && kill -9 `cat "$PID"` && echo -e "Stopping the NRPE ......\033[32m [OK]"; tput sgr0
+ rm -rf $PID
+ }
+
+status()
+{
+ test -f "$PID" && echo "NRPE running........(pid  `cat "$PID"`)" || echo "NRPE  is not running"
+}
+
+case "$1" in
+  start)
+  start
+  ;;
+  stop)
+  stop
+  ;;
+  status)
+  status
+  ;;
+  *)
+  echo $"Usage: $0 {start|stop|status}"
+esac
